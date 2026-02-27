@@ -33,8 +33,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // QR code endpoint
 app.get('/qr', async (req, res) => {
-  const ip = getLocalIP();
-  const url = `http://${ip}:${PORT}`;
+  const protocol = req.get('x-forwarded-proto') || (req.secure ? 'https' : 'http');
+  const host = req.get('host');
+  const url = `${protocol}://${host}`;
   try {
     const qrDataUrl = await QRCode.toDataURL(url, { width: 400, margin: 2 });
     res.json({ url, qr: qrDataUrl });
